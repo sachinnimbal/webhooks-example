@@ -1,0 +1,96 @@
+sequenceDiagram
+    participant Customer
+    participant ProductAPI
+    participant Database
+    participant WebhookDispatcher
+    participant WarehouseSystem
+    participant PricingSystem
+    participant NotificationService
+    participant EmailService
+
+    Note over Customer,EmailService: 1. Customer Places Order
+
+    Customer->>ProductAPI: POST /api/products/1/stock<br/>{quantity: 5, operation: "subtract"}
+    activate ProductAPI
+    
+    ProductAPI->>Database: Find Product by ID
+    Database-->>ProductAPI: Product (stock: 50)
+    
+    ProductAPI->>Database: Update Stock (50 → 45)
+    Database-->>ProductAPI: Product Updated
+    
+    Note over ProductAPI: Check if stock < threshold
+    
+    ProductAPI->>WebhookDispatcher: dispatchProductEvent()<br/>"product.stock.updated"
+    activate WebhookDispatcher
+    
+    ProductAPI-->>Customer: 200 OK<br/>{product with new stock}
+    deactivate ProductAPI
+    
+    Note over WebhookDispatcher,NotificationService: 2. Webhook Processing (Async)
+    
+    WebhookDispatcher->>Database: Find Active Subscriptions<br/>for "product.stock.updated"
+    Database-->>WebhookDispatcher: [Warehouse, Pricing, Analytics]
+    
+    WebhookDispatcher->>Database: Create WebhookDelivery Records<br/>(status: PENDING)
+    
+    par Parallel Webhook Deliveries
+        WebhookDispatcher->>WarehouseSystem: POST webhook<br/>X-Webhook-Signature: abc123<br/>Payload: {stock change}
+        activate WarehouseSystem
+        WarehouseSystem->>WarehouseSystem: Verify Signature
+        WarehouseSystem->>WarehouseSystem: Update Inventory System
+        WarehouseSystem-->>WebhookDispatcher: 200 OK
+        deactivate WarehouseSystem
+        WebhookDispatcher->>Database: Update Delivery<br/>(status: DELIVERED)
+        
+        WebhookDispatcher->>PricingSystem: POST webhook<br/>X-Webhook-Signature: def456<br/>Payload: {stock change}
+        activate PricingSystem
+        PricingSystem->>PricingSystem: Verify Signature
+        PricingSystem->>PricingSystem: Adjust Dynamic Pricing
+        PricingSystem-->>WebhookDispatcher: 200 OK
+        deactivate PricingSystem
+        WebhookDispatcher->>Database: Update Delivery<br/>(status: DELIVERED)
+    end
+    
+    deactivate WebhookDispatcher
+    
+    Note over ProductAPI,EmailService: 3. Low Stock Alert Triggered
+    
+    rect rgb(255, 200, 200)
+        Note over ProductAPI: Stock now 45, threshold 50<br/>Trigger Low Stock Alert
+        
+        ProductAPI->>WebhookDispatcher: dispatchProductEvent()<br/>"product.stock.low"
+        activate WebhookDispatcher
+        
+        WebhookDispatcher->>Database: Find Subscriptions<br/>for "product.stock.low"
+        Database-->>WebhookDispatcher: [Warehouse, Purchasing]
+        
+        WebhookDispatcher->>WarehouseSystem: POST webhook<br/>"product.stock.low"
+        activate WarehouseSystem
+        WarehouseSystem->>WarehouseSystem: Auto-trigger<br/>Purchase Order
+        WarehouseSystem-->>WebhookDispatcher: 200 OK
+        deactivate WarehouseSystem
+        
+        WebhookDispatcher->>NotificationService: POST webhook<br/>"product.stock.low"
+        activate NotificationService
+        NotificationService->>EmailService: Send Alert Email<br/>to inventory@company.com
+        EmailService-->>NotificationService: Email Sent
+        NotificationService-->>WebhookDispatcher: 200 OK
+        deactivate NotificationService
+        
+        deactivate WebhookDispatcher
+    end
+    
+    Note over Customer,EmailService: 4. Background Monitoring
+    
+    loop Every 1 Minute
+        WebhookDispatcher->>Database: Check Failed Deliveries
+        alt Has Failed Deliveries
+            WebhookDispatcher->>WarehouseSystem: Retry Failed Webhook
+            alt Success
+                WebhookDispatcher->>Database: Mark as DELIVERED
+            else Still Failing
+                WebhookDispatcher->>Database: Schedule Next Retry<br/>(Exponential Backoff)
+            end
+        end
+    end
