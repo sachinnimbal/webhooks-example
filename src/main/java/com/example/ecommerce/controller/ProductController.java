@@ -152,10 +152,10 @@ public class ProductController {
     @PostMapping("/{id}/stock")
     public ResponseEntity<Product> updateStock(
             @PathVariable Long id,
-            @RequestBody Map<String, Integer> stockUpdate) {
+            @RequestBody Map<String, Object> stockUpdate) {
 
-        Integer quantity = stockUpdate.get("quantity");
-        String operation = stockUpdate.getOrDefault("operation", 1).toString();
+        Integer quantity = (Integer) stockUpdate.get("quantity");
+        String operation = stockUpdate.getOrDefault("operation", "set").toString();
 
         log.info("Updating stock for product {}: {} {}", id, operation, quantity);
 
@@ -232,20 +232,15 @@ public class ProductController {
 
         for (Long id : productIds) {
             try {
-                Product product = null;
-
-                switch (operation) {
-                    case "activate":
-                        product = productService.updateStatus(id, ProductStatus.ACTIVE);
-                        break;
-                    case "deactivate":
-                        product = productService.updateStatus(id, ProductStatus.INACTIVE);
-                        break;
-                    case "discount":
+                Product product = switch (operation) {
+                    case "activate" -> productService.updateStatus(id, ProductStatus.ACTIVE);
+                    case "deactivate" -> productService.updateStatus(id, ProductStatus.INACTIVE);
+                    case "discount" -> {
                         Double discountPercent = ((Number) bulkOperation.get("discountPercent")).doubleValue();
-                        product = productService.applyDiscount(id, discountPercent);
-                        break;
-                }
+                        yield productService.applyDiscount(id, discountPercent);
+                    }
+                    default -> null;
+                };
 
                 if (product != null) {
                     webhookDispatcher.dispatchProductEvent("product.bulk.updated", product,
