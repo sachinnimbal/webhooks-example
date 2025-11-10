@@ -1,4 +1,4 @@
-package com.example.ecommerce.controller;
+package com.example.ecommerce.webhook.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

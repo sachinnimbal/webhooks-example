@@ -1,8 +1,8 @@
-package com.example.ecommerce.service;
+package com.example.ecommerce.webhook.service;
 
-import com.example.ecommerce.model.*;
-import com.example.ecommerce.respository.WebhookDeliveryRepository;
-import com.example.ecommerce.respository.WebhookSubscriptionRepository;
+import com.example.ecommerce.webhook.model.*;
+import com.example.ecommerce.webhook.respository.WebhookDeliveryRepository;
+import com.example.ecommerce.webhook.respository.WebhookSubscriptionRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

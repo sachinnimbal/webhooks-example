@@ -1,7 +1,7 @@
-package com.example.ecommerce.respository;
+package com.example.ecommerce.webhook.respository;
 
-import com.example.ecommerce.model.DeliveryStatus;
-import com.example.ecommerce.model.WebhookDelivery;
+import com.example.ecommerce.webhook.model.DeliveryStatus;
+import com.example.ecommerce.webhook.model.WebhookDelivery;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

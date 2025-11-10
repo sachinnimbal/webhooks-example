@@ -1,7 +1,7 @@
-package com.example.ecommerce.respository;
+package com.example.ecommerce.webhook.respository;
 
-import com.example.ecommerce.model.Product;
-import com.example.ecommerce.model.ProductStatus;
+import com.example.ecommerce.webhook.model.Product;
+import com.example.ecommerce.webhook.model.ProductStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

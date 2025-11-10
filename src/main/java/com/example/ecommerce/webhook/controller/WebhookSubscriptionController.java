@@ -1,9 +1,9 @@
-package com.example.ecommerce.controller;
+package com.example.ecommerce.webhook.controller;
 
-import com.example.ecommerce.model.*;
-import com.example.ecommerce.respository.WebhookDeliveryRepository;
-import com.example.ecommerce.respository.WebhookSubscriptionRepository;
-import com.example.ecommerce.service.WebhookDispatcher;
+import com.example.ecommerce.webhook.model.*;
+import com.example.ecommerce.webhook.respository.WebhookDeliveryRepository;
+import com.example.ecommerce.webhook.respository.WebhookSubscriptionRepository;
+import com.example.ecommerce.webhook.service.WebhookDispatcher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;

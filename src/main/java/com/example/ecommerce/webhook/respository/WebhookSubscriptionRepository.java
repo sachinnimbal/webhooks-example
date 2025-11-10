@@ -1,6 +1,6 @@
-package com.example.ecommerce.respository;
+package com.example.ecommerce.webhook.respository;
 
-import com.example.ecommerce.model.WebhookSubscription;
+import com.example.ecommerce.webhook.model.WebhookSubscription;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

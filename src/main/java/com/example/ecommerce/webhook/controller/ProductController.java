@@ -1,8 +1,10 @@
-package com.example.ecommerce.controller;
+package com.example.ecommerce.webhook.controller;
 
-import com.example.ecommerce.model.*;
-import com.example.ecommerce.service.ProductService;
-import com.example.ecommerce.service.WebhookDispatcher;
+import com.example.ecommerce.webhook.model.ChangeDetails;
+import com.example.ecommerce.webhook.model.Product;
+import com.example.ecommerce.webhook.model.ProductStatus;
+import com.example.ecommerce.webhook.service.ProductService;
+import com.example.ecommerce.webhook.service.WebhookDispatcher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

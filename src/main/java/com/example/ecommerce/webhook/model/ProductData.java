@@ -1,4 +1,4 @@
-package com.example.ecommerce.model;
+package com.example.ecommerce.webhook.model;
 
 import lombok.Builder;
 import lombok.Data;

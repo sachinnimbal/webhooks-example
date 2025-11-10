@@ -1,0 +1,185 @@
+scalar DateTime
+scalar BigDecimal
+
+type Query {
+    # Product Queries
+    products(category: String, status: ProductStatus): [Product!]!
+    product(id: ID!): Product
+    productBySku(sku: String!): Product
+    searchProducts(query: String!): [Product!]!
+    lowStockProducts: [Product!]!
+
+    # Webhook Queries
+    webhookSubscriptions: [WebhookSubscription!]!
+    webhookSubscription(id: ID!): WebhookSubscription
+    webhookDeliveries(page: Int, size: Int, status: DeliveryStatus): [WebhookDelivery!]!
+    webhookDelivery(id: ID!): WebhookDelivery
+    webhookStats: WebhookStats!
+    availableEvents: EventInfo!
+}
+
+type Mutation {
+    # Product Mutations
+    createProduct(input: CreateProductInput!): Product!
+    updateProduct(id: ID!, input: UpdateProductInput!): Product!
+    deleteProduct(id: ID!): Boolean!
+    updateStock(id: ID!, quantity: Int!, operation: StockOperation!): Product!
+    updatePrice(id: ID!, price: Float!, reason: String): Product!
+    bulkUpdate(operation: String!, productIds: [ID!]!, discountPercent: Float): BulkUpdateResult!
+
+    # Webhook Mutations
+    createWebhookSubscription(input: CreateWebhookSubscriptionInput!): WebhookSubscription!
+    updateWebhookSubscription(id: ID!, input: UpdateWebhookSubscriptionInput!): WebhookSubscription!
+    deleteWebhookSubscription(id: ID!): Boolean!
+    toggleWebhookSubscription(id: ID!): WebhookSubscription!
+    regenerateWebhookSecret(id: ID!): SecretRegenerationResult!
+    testWebhook(id: ID!): TestWebhookResult!
+    retryWebhookDelivery(deliveryId: ID!): RetryResult!
+}
+
+# Types
+type Product {
+    id: ID!
+    sku: String!
+    name: String!
+    description: String
+    price: BigDecimal!
+    stockQuantity: Int!
+    lowStockThreshold: Int!
+    status: ProductStatus!
+    category: String
+    brand: String
+    imageUrl: String
+    createdAt: DateTime!
+    updatedAt: DateTime
+}
+
+type WebhookSubscription {
+    id: ID!
+    name: String!
+    webhookUrl: String!
+    secret: String!
+    subscribedEvents: [String!]!
+    active: Boolean!
+    createdAt: DateTime!
+    lastDeliveryAt: DateTime
+}
+
+type WebhookDelivery {
+    id: ID!
+    webhookUrl: String!
+    eventType: String!
+    payload: String!
+    status: DeliveryStatus!
+    attempts: Int!
+    maxAttempts: Int!
+    responseCode: String
+    errorMessage: String
+    createdAt: DateTime!
+    nextRetryAt: DateTime
+    deliveredAt: DateTime
+}
+
+type WebhookStats {
+    totalDeliveries: Int!
+    successfulDeliveries: Int!
+    failedDeliveries: Int!
+    retrying: Int!
+    successRate: Float!
+}
+
+type EventInfo {
+    events: [String!]!
+    descriptions: [EventDescription!]!
+}
+
+type EventDescription {
+    event: String!
+    description: String!
+}
+
+type BulkUpdateResult {
+    operation: String!
+    totalProducts: Int!
+    successCount: Int!
+    failureCount: Int!
+}
+
+type SecretRegenerationResult {
+    message: String!
+    newSecret: String!
+    warning: String!
+}
+
+type TestWebhookResult {
+    message: String!
+    webhookUrl: String!
+    note: String!
+}
+
+type RetryResult {
+    message: String!
+    deliveryId: String!
+}
+
+# Enums
+enum ProductStatus {
+    ACTIVE
+    INACTIVE
+    OUT_OF_STOCK
+    DISCONTINUED
+}
+
+enum DeliveryStatus {
+    PENDING
+    DELIVERED
+    FAILED
+    RETRYING
+    EXHAUSTED
+}
+
+enum StockOperation {
+    SET
+    ADD
+    SUBTRACT
+}
+
+# Input Types
+input CreateProductInput {
+    sku: String!
+    name: String!
+    description: String
+    price: Float!
+    stockQuantity: Int!
+    lowStockThreshold: Int
+    status: ProductStatus
+    category: String
+    brand: String
+    imageUrl: String
+}
+
+input UpdateProductInput {
+    sku: String
+    name: String
+    description: String
+    price: Float
+    stockQuantity: Int
+    lowStockThreshold: Int
+    status: ProductStatus
+    category: String
+    brand: String
+    imageUrl: String
+}
+
+input CreateWebhookSubscriptionInput {
+    name: String!
+    webhookUrl: String!
+    subscribedEvents: [String!]!
+}
+
+input UpdateWebhookSubscriptionInput {
+    name: String
+    webhookUrl: String
+    subscribedEvents: [String!]
+    active: Boolean
+}

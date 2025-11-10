@@ -1,4 +1,4 @@
-package com.example.ecommerce.model;
+package com.example.ecommerce.webhook.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 @Entity
 @Table(name = "products")
@@ -58,5 +60,13 @@ public class Product {
 
     @Transient
     private Integer oldStock;
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt != null ? createdAt.atOffset(ZoneOffset.UTC) : null;
+    }
+
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt != null ? updatedAt.atOffset(ZoneOffset.UTC) : null;
+    }
 }
 

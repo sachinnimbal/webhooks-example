@@ -1,8 +1,8 @@
-package com.example.ecommerce.service;
+package com.example.ecommerce.webhook.service;
 
-import com.example.ecommerce.model.Product;
-import com.example.ecommerce.model.ProductStatus;
-import com.example.ecommerce.respository.ProductRepository;
+import com.example.ecommerce.webhook.model.Product;
+import com.example.ecommerce.webhook.model.ProductStatus;
+import com.example.ecommerce.webhook.respository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
